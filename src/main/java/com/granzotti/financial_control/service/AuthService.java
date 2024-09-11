@@ -1,6 +1,7 @@
 package com.granzotti.financial_control.service;
 
 import com.granzotti.financial_control.dto.AuthRequest;
+import com.granzotti.financial_control.dto.ResetPasswordRequest;
 import com.granzotti.financial_control.model.User;
 import com.granzotti.financial_control.repository.UserRepository;
 import com.granzotti.financial_control.security.JwtService;
@@ -13,10 +14,11 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private JwtService jwtService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -47,14 +49,17 @@ public class AuthService {
         return ResponseEntity.ok(token);
     }
 
-    public ResponseEntity<?> resetPassword(String email) {
-        User user = userRepository.findByEmail(email);
+    public ResponseEntity<?> resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail());
         if (user == null) {
             return ResponseEntity.status(404).body("Usuário não encontrado");
         }
 
         // Gera um token temporário para recuperação de senha
         String resetToken = jwtService.generateToken(user.getUsername());
+        String subject = "Recuperação de Senha";
+        String body = "Use o seguinte token para resetar sua senha: " + resetToken;
+        emailService.sendSimpleEmail(user.getEmail(), subject, body);
 
         // Aqui você poderia enviar o token por e-mail
         // emailService.sendResetPasswordEmail(user.getEmail(), resetToken);

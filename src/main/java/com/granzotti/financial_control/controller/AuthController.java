@@ -1,5 +1,6 @@
 package com.granzotti.financial_control.controller;
 
+import com.granzotti.financial_control.dto.ResetPasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody String email) {
-        return authService.resetPassword(email);
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+
+        return authService.resetPassword(request);
     }
 }
