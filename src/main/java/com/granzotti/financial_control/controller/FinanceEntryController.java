@@ -16,8 +16,9 @@ public class FinanceEntryController {
     private FinanceEntryService financeEntryService;
 
     @PostMapping
-    public ResponseEntity<FinanceEntry> createFinanceEntry(@RequestBody FinanceEntry entry) {
-        return ResponseEntity.ok(financeEntryService.createFinanceEntry(entry));
+    public ResponseEntity<FinanceEntry> createFinanceEntry(@RequestBody FinanceEntry financeEntry) {
+        FinanceEntry createdEntry = financeEntryService.createFinanceEntry(financeEntry);
+        return ResponseEntity.ok(createdEntry);
     }
 
     @GetMapping("/{id}")

@@ -1,12 +1,12 @@
 package com.granzotti.financial_control.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
@@ -19,7 +19,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(htmlBody, true); // O segundo parâmetro indica que o conteúdo é HTML
+        helper.setText(htmlBody, true);
         helper.setFrom("seu-email@gmail.com");
 
         mailSender.send(message);
@@ -31,7 +31,7 @@ public class EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
-            message.setFrom("seu-email@gmail.com");
+            message.setFrom("noreply@email.com");
 
             mailSender.send(message);
         } catch (Exception e) {

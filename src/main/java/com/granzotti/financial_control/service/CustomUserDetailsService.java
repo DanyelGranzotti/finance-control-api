@@ -16,18 +16,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Busca o usuário no banco de dados pelo nome de usuário
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);
 
         if (user == null) {
             throw new UsernameNotFoundException("Usuário não encontrado com o nome: " + username);
         }
 
-        // Converte o usuário encontrado para um objeto UserDetails, necessário para o Spring Security
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword()) // A senha já deve estar criptografada no banco
-                .authorities("USER") // Define a autoridade padrão (pode ser ajustada para múltiplos papéis/roles)
+                .password(user.getPassword())
+                .authorities("USER")
                 .build();
     }
 }

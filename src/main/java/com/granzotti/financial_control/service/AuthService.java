@@ -13,14 +13,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     @Autowired
     private JwtService jwtService;
     @Autowired
     private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
-
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public ResponseEntity<?> register(AuthRequest request) {
         if (userRepository.findByUsername(request.getUsername()) != null) {
@@ -38,12 +37,11 @@ public class AuthService {
     }
 
     public ResponseEntity<?> login(AuthRequest request) {
-        User user = userRepository.findByUsername(request.getUsername());
+        User user = userRepository.findByUsername(request.getUsername()).orElse(null);
         if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(401).body("Usuário ou senha incorretos");
         }
 
-        // Gerar o token JWT
         String token = jwtService.generateToken(user.getUsername());
 
         return ResponseEntity.ok(token);
@@ -55,14 +53,10 @@ public class AuthService {
             return ResponseEntity.status(404).body("Usuário não encontrado");
         }
 
-        // Gera um token temporário para recuperação de senha
         String resetToken = jwtService.generateToken(user.getUsername());
         String subject = "Recuperação de Senha";
         String body = "Use o seguinte token para resetar sua senha: " + resetToken;
         emailService.sendSimpleEmail(user.getEmail(), subject, body);
-
-        // Aqui você poderia enviar o token por e-mail
-        // emailService.sendResetPasswordEmail(user.getEmail(), resetToken);
 
         return ResponseEntity.ok("Instruções para redefinição de senha enviadas para o e-mail");
     }
