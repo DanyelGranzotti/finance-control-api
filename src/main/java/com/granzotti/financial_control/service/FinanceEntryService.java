@@ -25,10 +25,44 @@ public class FinanceEntryService {
     }
 
     public FinanceEntry getFinanceEntry(Long id) {
-        return financeEntryRepository.findById(id).orElseThrow();
+        FinanceEntry entry = financeEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Finance Entry not found"));
+        validateOwnership(entry);
+        return entry;
     }
 
     public List<FinanceEntry> getAllEntries() {
-        return financeEntryRepository.findAll();
+        User authenticatedUser = securityUtils.getAuthenticatedUser();
+        return financeEntryRepository.findByUser(authenticatedUser);
+    }
+
+    public FinanceEntry updateFinanceEntry(Long id, FinanceEntry financeEntry) {
+        FinanceEntry existingEntry = getFinanceEntry(id);
+        validateOwnership(existingEntry);
+
+        existingEntry.setName(financeEntry.getName());
+        existingEntry.setValue(financeEntry.getValue());
+        existingEntry.setDescription(financeEntry.getDescription());
+        existingEntry.setDate(financeEntry.getDate());
+        existingEntry.setType(financeEntry.getType());
+        existingEntry.setCategory(financeEntry.getCategory());
+        existingEntry.setFixed(financeEntry.isFixed());
+        existingEntry.setPaid(financeEntry.isPaid());
+        existingEntry.setInstallmentMonths(financeEntry.getInstallmentMonths());
+
+        return financeEntryRepository.save(existingEntry);
+    }
+
+    public void deleteFinanceEntry(Long id) {
+        FinanceEntry entry = getFinanceEntry(id);
+        validateOwnership(entry);
+        financeEntryRepository.deleteById(id);
+    }
+    
+    private void validateOwnership(FinanceEntry entry) {
+        User authenticatedUser = securityUtils.getAuthenticatedUser();
+        if (!entry.getUser().equals(authenticatedUser)) {
+            throw new RuntimeException("You cannot modify an entry that does not belong to you");
+        }
     }
 }

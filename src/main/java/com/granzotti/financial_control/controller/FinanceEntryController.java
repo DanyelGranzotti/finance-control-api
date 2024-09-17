@@ -23,11 +23,24 @@ public class FinanceEntryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FinanceEntry> getFinanceEntry(@PathVariable Long id) {
-        return ResponseEntity.ok(financeEntryService.getFinanceEntry(id));
+        FinanceEntry entry = financeEntryService.getFinanceEntry(id);
+        return ResponseEntity.ok(entry);
     }
 
     @GetMapping
     public List<FinanceEntry> getAllEntries() {
         return financeEntryService.getAllEntries();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FinanceEntry> updateFinanceEntry(@PathVariable Long id, @RequestBody FinanceEntry financeEntry) {
+        FinanceEntry updatedEntry = financeEntryService.updateFinanceEntry(id, financeEntry);
+        return ResponseEntity.ok(updatedEntry);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFinanceEntry(@PathVariable Long id) {
+        financeEntryService.deleteFinanceEntry(id);
+        return ResponseEntity.noContent().build();
     }
 }
